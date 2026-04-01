@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>にこについて - にこのHP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --niko-pink-light: #ffe6ea;
+            --niko-pink: #ffb5c5;
+            --niko-cream: #fffaf0;
+            --niko-gold: #f0e68c;
+            --niko-brown: #8b4513;
+            --font-main: 'Mochiy+Pop One', sans-serif;
+            --font-sub: 'Quicksand', sans-serif;
+        }
+
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background-color: var(--niko-pink-light); color: var(--niko-brown);
+            font-family: var(--font-main); 
+            background-image: 
+                radial-gradient(var(--niko-pink) 10%, transparent 11%),
+                radial-gradient(var(--niko-pink) 10%, transparent 11%);
+            background-size: 30px 30px;
+            background-position: 0 0, 15px 15px;
+        }
+
+        .container {
+            position: fixed; inset: 0; display: flex; flex-direction: column; z-index: 500;
+            background: radial-gradient(circle, var(--niko-cream) 0%, var(--niko-pink-light) 100%);
+        }
+
+        header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 30px 50px; background: #fff; box-shadow: 0 2px 10px rgba(255, 181, 197, 0.3);
+            border-bottom: 4px solid var(--niko-pink);
+        }
+
+        header h1 {
+            font-size: 32px; color: var(--niko-pink); margin: 0;
+            text-shadow: 1px 1px 0 #fff;
+        }
+
+        header a {
+            background: var(--niko-pink); color: #fff; padding: 10px 20px;
+            border-radius: 20px; text-decoration: none; font-size: 14px;
+            border: 2px solid var(--niko-cream); transition: 0.3s ease;
+        }
+
+        header a:hover {
+            background: var(--niko-cream); color: var(--niko-pink);
+        }
+
+        main {
+            flex: 1; overflow-y: auto; padding: 40px 50px;
+        }
+
+        .profile-container {
+            background: #fff; padding: 40px; border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(255, 181, 197, 0.2);
+            max-width: 700px; margin: 0 auto;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        .profile-header {
+            text-align: center; margin-bottom: 30px;
+        }
+
+        .icon-circle { 
+            width: 110px; height: 110px; border: 4px solid #fff; border-radius: 50%; padding: 8px; 
+            background: rgba(255, 181, 197, 0.2); margin-bottom: 20px; display: flex; align-items: center; justify-content: center; position: relative; 
+            box-shadow: 0 5px 15px rgba(255, 181, 197, 0.3);
+            background-image: radial-gradient(#fff 20%, transparent 21%), radial-gradient(#fff 20%, transparent 21%);
+            background-size: 15px 15px; background-position: 0 0, 7.5px 7.5px;
+        }
+        .icon-circle img { width: 80%; height: 80%; border-radius: 50%; background: #fff; object-fit: cover; }
+        .app-label { font-size: 14px; letter-spacing: 1px; font-weight: 700; color: var(--niko-brown); text-align: center; }
+
+
+        .profile-image {
+            width: 110px; height: 110px; border: 4px solid #fff; border-radius: 50%; padding: 8px; 
+            background: rgba(255, 181, 197, 0.2); margin-bottom: 20px; display: flex; align-items: center; justify-content: center; position: relative; 
+            box-shadow: 0 5px 15px rgba(255, 181, 197, 0.3);
+            background-image: radial-gradient(#fff 20%, transparent 21%), radial-gradient(#fff 20%, transparent 21%);
+            background-size: 15px 15px; background-position: 0 0, 7.5px 7.5px;
+        }
+
+        .profile-icon-circle {
+            width: 150px; height: 150px; border-radius: 50%; overflow: hidden;
+            margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 5px 15px rgba(255, 181, 197, 0.3);
+            background: rgba(255, 181, 197, 0.1);
+        }
+        .profile-icon-circle img {
+            width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
+        }
+
+        .profile-name {
+            font-size: 28px; font-weight: 700; color: var(--niko-pink);
+            margin: 0; text-shadow: 1px 1px 0 #fff;
+        }
+
+        .profile-sub {
+            font-family: var(--font-sub); font-size: 14px; color: #999;
+            margin: 10px 0 20px;
+        }
+
+        .profile-section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 18px; font-weight: 700; color: var(--niko-brown);
+            border-bottom: 3px solid var(--niko-gold); padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .profile-content {
+            font-family: var(--font-sub); font-size: 14px; color: #666;
+            line-height: 1.8;
+        }
+
+        .profile-stats {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 15px; margin-top: 15px;
+        }
+
+        .stat-item {
+            background: rgba(255, 181, 197, 0.1); padding: 15px;
+            border-radius: 10px; text-align: center;
+            border: 2px solid var(--niko-pink);
+        }
+
+        .stat-number {
+            font-size: 24px; font-weight: 700; color: var(--niko-pink);
+        }
+
+        .stat-label {
+            font-family: var(--font-sub); font-size: 12px; color: var(--niko-brown);
+            margin-top: 5px;
+        }
+
+        .links {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 10px; margin-top: 20px;
+        }
+
+        .link-btn {
+            background: var(--niko-pink); color: #fff; padding: 12px;
+            border-radius: 10px; text-decoration: none; text-align: center;
+            font-size: 12px; font-weight: 700; border: 2px solid var(--niko-cream);
+            transition: 0.3s ease;
+        }
+
+        .link-btn:hover {
+            background: var(--niko-cream); color: var(--niko-pink);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* スクロールバー */
+        main::-webkit-scrollbar { width: 8px; }
+        main::-webkit-scrollbar-track { background: rgba(255, 181, 197, 0.1); border-radius: 10px; }
+        main::-webkit-scrollbar-thumb { background: var(--niko-pink); border-radius: 10px; }
+        main::-webkit-scrollbar-thumb:hover { background: var(--niko-brown); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>にこのプロフィール</h1>
+            <a href="login.html">← ログインモーションを見る</a>
+            <a href="index.html">← ホームへ戻る</a>
+        </header>
+
+        <main>
+            <div class="profile-container">
+                <div class="profile-header">
+                    <div class="profile-icon-circle"><img src="images/にこ顔面.jpg" alt="にこ"></div>
+                    <h2 class="profile-name">にこ🧸🎮</h2>
+                    <p class="profile-sub">配信者</p>
+                </div>
+
+                <div class="profile-section">
+                    <div class="section-title">💫 自己紹介</div>
+                    <div class="profile-content">
+                        ツイキャスで基本配信してます！<br>
+                        ❥❥❥毎日笑顔を目標に沢山の人に少しでも笑顔になって欲しいにこちゃんです！<br> 
+                        ママ様→(@60mai)様/ファンマ→🧸🎮/フォロバ専用サブ垢⇒(@niko_niko__02)<br>
+                        【⇩ハッシュタグ達⇩] <br>
+                        🍰 #にこにこスイーツ 🎨 #にこの絵本 ✏️ #じゃぽにこ学習帳
+                    </div>
+                </div>
+
+                <div class="profile-section">
+                    <div class="section-title">🔴 主な配信内容</div>
+                    <div class="profile-content">
+                        アクションゲームやホラーゲーム、謎解きゲームなどのゲーム配信からゆる雑談まで、幅広く配信しています！<br>
+                        コラボも随時受け付けています！
+                    </div>
+                </div>
+
+                <div class="profile-section">
+                    <div class="section-title">🎮 好きなゲーム</div>
+                    <div class="profile-content">
+                        アクションゲーム、ホラーゲーム、謎解きゲーム、インディーゲームなど、<br>
+                        面白いゲームなら何でも好きです！<br>
+                    </div>
+                </div>
+
+                <div class="profile-section">
+                    <div class="section-title">🎯 配信のこだわり</div>
+                    <div class="profile-content">
+                        常に笑顔で、楽しい雰囲気作りを心がけています。<br>
+                        リスナーさんのコメントを大切にして、一緒に盛り上げる配信を目指しています。<br>
+                        初見さんも大歓迎です！気軽にコメントしてね😊✨
+                    </div>
+                </div>
+
+                <div class="profile-section">
+                    <div class="section-title">🔗 各種リンク</div>
+                    <div class="links">
+                        <a href="https://x.com/niko01_kuma?s=20" class="link-btn">X（旧ツイッター）</a>
+                        <a href="https://twitcasting.tv/niko01_kuma" class="link-btn">配信サイト（ツイキャス）</a>
+                        <a href="https://www.youtube.com/@niko_mohu" class="link-btn">YouTube</a>
+                        <a href="https://fansfer.p-dlt.com/NW7SA7g53OYhVMPUEe3g81QjigS2" class="link-btn">お手紙等(fansfer)</a>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

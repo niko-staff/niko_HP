@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧸にこのホームページ🧸
+    </title>
+    <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* にこさんのパステルカラー：ピンク、クリーム、ゴールド、ブラウン */
+            --niko-pink-light: #ffe6ea;
+            --niko-pink: #ffb5c5;
+            --niko-cream: #fffaf0;
+            --niko-gold: #f0e68c;
+            --niko-brown: #8b4513; /* チョコレートブラウン */
+            --font-main: 'Mochiy+Pop One', sans-serif;
+            --font-sub: 'Quicksand', sans-serif;
+        }
+
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background-color: var(--niko-pink-light); color: var(--niko-brown);
+            font-family: var(--font-main); overflow: hidden;
+            /* 背景.pngを使用 */
+            background-image: url('images/背景.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            opacity: 0.9;
+        }
+
+        /* --- 背景演出（キラキラ） --- */
+        #hex-bg { display: none; }
+        #ar-overlay { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+        
+        /* 壁紙は明るく、少しぼかして優しく */
+        .wall-bg { position: fixed; inset: 0; background: url('background.PNG') center/cover no-repeat; opacity: 0; transition: opacity 2s; z-index: -1; filter: contrast(1.1) brightness(1.1) saturate(1.1) blur(2px); }
+        
+        /* フレーム：リボンとレースがかったパステルフレーム */
+        .ar-frame { position: fixed; inset: 20px; border: 8px solid #fff; border-radius: 40px; z-index: 1000; pointer-events: none; box-shadow: 0 0 20px rgba(255, 181, 197, 0.5); }
+        .ar-frame::before { content: "✨🧸✨"; position: absolute; top: -20px; left: 50%; transform: translateX(-50%); background: #fff; padding: 0 20px; font-size: 24px; border-radius: 20px; }
+        .ar-frame::after { content: "にこのHP"; position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%); background: #fff; padding: 0 20px; font-size: 16px; border-radius: 20px; }
+
+        /* --- UIパーツ --- */
+
+        /* 右下のモニターを廃止し、左下に看板風の「今日の目標」を設置 */
+        .system-monitor { 
+            text-decoration: none; color: inherit; display: flex; flex-direction: column; align-items: center;
+            opacity: 0; transform: translateY(20px) scale(0.9); transition: 0.6s ease;
+        }
+
+        /* --- 画面レイアウト --- */
+        .screen { position: fixed; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 500; }
+        
+        /* アプリグリッド：もっとふんわりと */
+        .app-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 50px; max-width: 1200px; width: 100%; padding: 0 50px; box-sizing: border-box; margin: 0 auto; }
+        .app-node { text-decoration: none; color: inherit; display: flex; flex-direction: column; align-items: center; opacity: 0; transform: translateY(20px) scale(0.9); transition: 0.6s ease; }
+        .app-node:hover { transform: translateY(-15px) scale(1.05); }
+        
+        /* アイコン：サイバーなサークルから、パステルな雲やリボンへ */
+        .icon-circle { 
+            width: 110px; height: 110px; border: 4px solid #fff; border-radius: 50%; padding: 8px; 
+            background: rgba(255, 181, 197, 0.2); margin-bottom: 20px; display: flex; align-items: center; justify-content: center; position: relative; 
+            box-shadow: 0 5px 15px rgba(255, 181, 197, 0.3);
+            background-image: radial-gradient(#fff 20%, transparent 21%), radial-gradient(#fff 20%, transparent 21%);
+            background-size: 15px 15px; background-position: 0 0, 7.5px 7.5px;
+        }
+        .icon-circle::after { content: "✨"; position: absolute; font-size: 20px; bottom: -10px; right: -10px; animation: heartbeat 2s infinite; }
+        .icon-circle img { width: 80%; height: 80%; border-radius: 50%; background: #fff; object-fit: cover; }
+        .app-label { font-size: 14px; letter-spacing: 1px; font-weight: 700; color: var(--niko-brown); text-align: center; }
+
+        /* ボタン：サイバーから、ぷっくりしたリボン風ボタンへ */
+        .btn-sao { 
+            background: var(--niko-pink); border: 4px solid var(--niko-cream); color: #fff; 
+            padding: 15px 60px; cursor: pointer; font-family: inherit; font-size: 20px; letter-spacing: 3px; 
+            transition: 0.4s ease; border-radius: 50px;
+            box-shadow: 0 5px 0 var(--niko-pink-light);
+        }
+        .btn-sao:hover { background: var(--niko-cream); color: var(--niko-pink); transform: translateY(3px); box-shadow: 0 2px 0 var(--niko-pink-light); }
+        .btn-sao.pulse { animation: pulse-pink 2s infinite; }
+
+        /* メンテナンスオーバーレイ */
+        .maintenance-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .maintenance-content {
+            background: #fff;
+            padding: 60px 40px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .maintenance-content h2 {
+            margin: 0 0 20px;
+            font-size: 32px;
+            color: #333;
+        }
+
+        .maintenance-content p {
+            margin: 0 0 30px;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #666;
+        }
+
+        .maintenance-spinner {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #00b6bd;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* --- アニメーション --- */
+        .show-hud { opacity: 1 !important; transform: translateY(0) scale(1) !important; }
+        .reveal { opacity: 1 !important; transform: translateY(0) scale(1) !important; }
+        .dissolve { animation: dissolve-anim 0.8s forwards; }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes dissolve-anim { 0% { opacity: 1; transform: scale(1); filter: blur(0); } 100% { opacity: 0; transform: scale(1.1); filter: blur(15px); } }
+        @keyframes link-start-anim { 
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); letter-spacing: 20px; filter: blur(10px); } 
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1); letter-spacing: 10px; filter: blur(0); } 
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(0.95); filter: blur(5px); } 
+        }
+        @keyframes heartbeat { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        @keyframes pulse-pink { 0% { box-shadow: 0 0 0 0 rgba(255, 181, 197, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(255, 181, 197, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 181, 197, 0); } }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(-50px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- モバイルレスポンシブ対応 --- */
+        @media (max-width: 768px) {
+            .app-grid { 
+                grid-template-columns: 1fr; 
+                gap: 30px; 
+                padding: 0 20px; 
+                max-width: 400px;
+            }
+            .icon-circle {
+                width: 110px;
+                height: 110px;
+                padding: 6px;
+                border: 3px solid #fff;
+            }
+            .icon-circle::after { font-size: 16px; }
+            .app-label { font-size: 12px; }
+            .btn-sao { 
+                padding: 12px 40px; 
+                font-size: 16px; 
+                letter-spacing: 2px;
+                box-shadow: 0 3px 0 var(--niko-pink-light);
+            }
+
+            .system-monitor { 
+                opacity: 0; 
+                transform: translateY(20px) scale(0.9); 
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- サイト更新中オーバーレイ -->
+    <div id="maintenanceOverlay" class="maintenance-overlay">
+        <div class="maintenance-content">
+            <h2>サイト更新中</h2>
+            <p>現在サイトをメンテナンス中です。<br>しばらくの間、ご利用いただけません。<br>ご迷惑をおかけして申し訳ございません。</p>
+            <div class="maintenance-spinner"></div>
+        </div>
+    </div>
+
+    <div id="hex-bg"></div>
+    <div id="ar-overlay"></div>
+    <div id="wall-bg" class="wall-bg"></div>
+    <div class="ar-frame"></div>
+
+    <div id="home-screen" class="screen">
+        <div class="app-grid">
+            <a href="news.html" class="app-node"><div class="icon-circle"><img src="images/oshirase.png" alt="お知らせ"></div><span class="app-label">お知らせ</span></a>
+            <a href="profile.html" class="app-node"><div class="icon-circle"><img src="images/profile.jpg" alt="配信者紹介"></div><span class="app-label">にこのプロフィール</span></a>
+            <a href="schedule.html" class="app-node"><div class="icon-circle"><img src="images/schedule.png" alt="配信スケジュール"></div><span class="app-label">配信スケジュール</span></a>
+            <!-- <div class="app-node" id="hud-monitor"> -->
+                <!-- <div class="icon-circle" style="background: rgba(240, 230, 140, 0.3); margin-bottom: 20px;">🧸</div>
+                <div style="text-align: center;">
+                    <div style="font-size: 14px; font-weight: 700; color: var(--niko-brown); margin-bottom: 10px;">にことみんなの目標</div>
+                    <div id="target-log" style="font-size: 12px; color: #888;"></div>
+                </div> -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const wait = ms => new Promise(r => setTimeout(r, ms));
+
+        // ⬐⬐⬐ ここを変更して整変表示を管理 ⬐⬐⬐
+        const isMaintenanceMode = false;  // true: 更新中表示 、 false: 通常表示
+
+        function startSMILEMonitor() {
+            const logBox = document.getElementById('target-log');
+            const smilePts = document.getElementById('smile-pts');
+            const targetLines = ["配信をチェックする🧸", "みんなに挨拶する🍰", "たくさん笑う✨", "お菓子を食べる🍬", "可愛い絵を描く🎨", "ゲームを楽しむ🎮", "フォロワーさんを大切に❥❥", "毎日笑顔を忘れない！✨"];
+            
+            // 初回表示
+            logBox.textContent = "＞ " + targetLines[0];
+            
+            setInterval(() => {
+                logBox.textContent = "＞ " + targetLines[Math.floor(Math.random() * targetLines.length)];
+                // 笑顔ポイントをちょっとずつ増やす
+                if(Math.random() > 0.5) smilePts.textContent = "✨" + (Math.floor(Math.random() * 10) + 990) + "k+";
+            }, 2500);
+        }
+
+        function setMaintenance(isActive) {
+            const overlay = document.getElementById('maintenanceOverlay');
+            if (isActive) {
+                overlay.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            } else {
+                overlay.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        async function initiateHomeScreen() {
+            // 1. 壁紙の展開開始
+            document.getElementById('wall-bg').style.opacity = "1";
+            
+            
+            // 3. 中央ホーム画面のコンテナを表示
+            document.getElementById('home-screen').style.display = 'flex';
+            
+            // 4. アプリアイコンを順次表示
+            await wait(300);
+            const nodes = document.querySelectorAll('.app-node');
+            nodes.forEach((node, i) => {
+                setTimeout(() => node.classList.add('reveal'), i * 150);
+            });
+
+            // 5. 今日の目標（看板）を表示
+            await wait(300);
+            document.getElementById('hud-monitor').classList.add('show-hud');
+        }
+
+        async function logout() {
+            document.getElementById('home-screen').classList.add('dissolve');
+            document.getElementById('wall-bg').style.opacity = "0";
+            document.getElementById('hud-player').classList.remove('show-hud');
+            document.getElementById('hud-monitor').classList.remove('show-hud');
+            await wait(800);
+            
+            // ログアウト：ローカルストレージをクリア
+            localStorage.removeItem('isLoggedIn');
+            // ログインページにリダイレクト
+            window.location.href = 'login.html';
+        }
+
+        // ページロード時の処理
+        window.addEventListener('DOMContentLoaded', function() {
+            // ログイン状態をチェック
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            if (!isLoggedIn) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // ログイン状態がある場合、ホーム画面を表示
+            setMaintenance(isMaintenanceMode);
+            initiateHomeScreen();
+            startSMILEMonitor();
+        });
+    </script>
+</body>
+</html>
+
