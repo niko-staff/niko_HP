@@ -179,7 +179,7 @@
     <div id="maintenanceOverlay" class="maintenance-overlay">
         <div class="maintenance-content">
             <h2>メンテナンス中</h2>
-            <p>現在サイトをメンテナンス中です。<br>【メンテナンス時間: 未定】 <br>※進捗状況によっては、前後する場合があります。</p>
+            <p>現在メンテナンス中です。<br>【メンテナンス時間: 23:00 - 24:00】 <br>※進捗状況によっては、前後する場合があります。</p>
             <div class="maintenance-spinner"></div>
         </div>
     </div>
@@ -208,7 +208,7 @@
         const wait = ms => new Promise(r => setTimeout(r, ms));
 
         // ⬐⬐⬐ ここを変更して整変表示を管理 ⬐⬐⬐
-        const isMaintenanceMode = false;  // true: 更新中表示 、 false: 通常表示
+        const isMaintenanceMode = true;  // true: 更新中表示 、 false: 通常表示
 
         function startSMILEMonitor() {
             const logBox = document.getElementById('target-log');
