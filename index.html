@@ -208,7 +208,7 @@
         const wait = ms => new Promise(r => setTimeout(r, ms));
 
         // ⬐⬐⬐ ここを変更して整変表示を管理 ⬐⬐⬐
-        const isMaintenanceMode = false;  // true: 更新中表示 、 false: 通常表示
+        const isMaintenanceMode = true;  // true: 更新中表示 、 false: 通常表示
 
         function startSMILEMonitor() {
             const logBox = document.getElementById('target-log');
