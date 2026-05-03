@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIキャラ・チャットシステム（フル機能版）</title>
+    <style>
+        body, html { 
+            margin: 0; padding: 0; height: 100%; width: 100%; 
+            overflow: hidden; font-family: "HG創英角ﾎﾟｯﾌﾟ体", "Meiryo", sans-serif; 
+        }
+
+        /* キャラクター背景 */
+        #character-bg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover; z-index: 1; transition: opacity 0.5s;
+        }
+
+        /* UIレイヤー */
+        #ui-layer {
+            position: relative; z-index: 2; height: 100%; width: 100%;
+            display: flex; flex-direction: column;
+            background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.7) 100%);
+        }
+
+        /* メッセージエリア */
+        #messages {
+            flex: 1; padding: 40px; overflow-y: auto;
+            display: flex; flex-direction: column; gap: 15px;
+        }
+        #messages::-webkit-scrollbar { width: 0; }
+
+        /* 吹き出しスタイル */
+        .msg {
+            padding: 15px 25px; border-radius: 15px; max-width: 65%;
+            font-size: 20px; font-weight: bold; line-height: 1.5;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .bot { background: rgba(255, 255, 255, 0.95); align-self: flex-start; color: #111; }
+        .user { background: rgba(0, 123, 255, 0.9); align-self: flex-end; color: white; }
+
+        /* 入力エリア（Python版の配置を意識） */
+        #input-area {
+            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
+            padding: 30px; display: flex; justify-content: center; gap: 15px;
+        }
+        input { 
+            width: 50%; padding: 15px 20px; font-size: 18px; 
+            border: none; border-radius: 30px; outline: none; background: white;
+        }
+        button { 
+            background: #007bff; color: white; border: none; 
+            padding: 0 30px; border-radius: 30px; cursor: pointer; 
+            font-weight: bold; font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+<img id="character-bg" src="https://via.placeholder.com/1920x1080/444/fff?text=Wait..." alt="character">
+
+<div id="ui-layer">
+    <div id="messages">
+        <div class="msg bot">（……なにか用？）</div>
+    </div>
+    
+    <div id="input-area">
+        <input type="text" id="user-input" placeholder="例：プロフィール、今日の配信、5/5の予定" autocomplete="off">
+        <button onclick="chatProcess()">送信</button>
+    </div>
+</div>
+
+<script>
+    /* --- 1. データ設定エリア --- */
+    const profileText = "【自己紹介】\n名前：のあ\n趣味：ゲーム実況、歌うこと\n一言：最強のVTuberになるから、ちゃんと見ててよね！";
+
+    // テスト用スケジュールデータ（YYYY-MM-DDをキーにする）
+    const scheduleData = {
+        "2026-05-04": "23:00〜：漢字でGO!",
+        "2026-05-05": "23:00〜：リスナー参加型（マリオカート８DX）",
+        "2026-05-06": "22:00〜：リスナー参加型（スマブラ）",
+        "2026-05-07": "22:00〜：ゆる雑 〜トモコレを添えて〜",
+        "2026-05-08": "22:00〜：ゆる雑",
+        "2026-05-09": "23:00〜：ゆる雑",
+        "2026-05-10": "23:00〜：トモコレ"
+    };
+
+    // 表情画像URL
+    const scenes = {
+        "normal": "https://via.placeholder.com/1920x1080/444/fff?text=Normal",
+        "happy": "https://via.placeholder.com/1920x1080/ff69b4/fff?text=Happy",
+        "angry": "https://via.placeholder.com/1920x1080/f00/fff?text=Angry"
+    };
+
+    /* --- 2. 状態管理（Pythonのstatus.py/logic.pyを再現） --- */
+    const status = {
+        hitgame_flg: false,
+        hit_answer: null
+    };
+
+    // 初期画像
+    document.getElementById("character-bg").src = scenes.normal;
+
+    /* --- 3. メイン処理 --- */
+    function chatProcess() {
+        const input = document.getElementById("user-input");
+        const msgVal = input.value.trim();
+        if(!msgVal) return;
+
+        addMessage(msgVal, "user");
+        input.value = "";
+
+        // Python版の "connecting" 演出を再現
+        const botMsgDiv = addMessage("connecting...", "bot");
+
+        setTimeout(() => {
+            handleLogic(msgVal, botMsgDiv);
+        }, 800);
+    }
+
+    function handleLogic(message, msgElement) {
+        const img = document.getElementById("character-bg");
+        let replyText = "";
+        let currentScene = scenes.normal;
+
+        // A. 日付指定の抽出（正規表現：5月5日 や 5/5 に対応）
+        const dateMatch = message.match(/(\d{1,2})[月\/\-](\d{1,2})/);
+
+        // B. 数当てゲーム実行中（Python版ロジック）
+        if (status.hitgame_flg) {
+            const userNum = parseInt(message);
+            if (isNaN(userNum)) {
+                replyText = "数字で答えてくれない？";
+            } else if (userNum === status.hit_answer) {
+                replyText = `正解！！答えは ${status.hit_answer} だよ！`;
+                currentScene = scenes.happy;
+                status.hitgame_flg = false;
+            } else {
+                replyText = userNum > status.hit_answer ? "もっと小さいよ" : "もっと大きいよ";
+            }
+        } 
+        // C. 通常キーワード判定
+        else {
+            // 1. プロフィール
+            if (message.includes("プロフィール") || message.includes("自己紹介")) {
+                replyText = profileText;
+                currentScene = scenes.happy;
+            }
+            // 2. 日付直接指定の検索
+            else if (dateMatch) {
+                const m = dateMatch[1].padStart(2, '0');
+                const d = dateMatch[2].padStart(2, '0');
+                const key = `2026-${m}-${d}`; // 年は固定（必要に応じ自動取得）
+                replyText = scheduleData[key] ? `${m}月${d}日の予定は、${scheduleData[key]} だよ！` : `${m}月${d}日の予定はまだ入ってないな。`;
+                currentScene = scheduleData[key] ? scenes.happy : scenes.normal;
+            }
+            // 3-1. 「今日」の配信
+            else if (message.includes("今日") && message.includes("配信")) {
+                const todayKey = getFormattedDate(new Date());
+                replyText = scheduleData[todayKey] ? `今日の予定は ${scheduleData[todayKey]} だよ！` : "今日の予定はまだ決まってないよ。";
+                currentScene = scheduleData[todayKey] ? scenes.happy : scenes.normal;
+            }
+
+            // 3-2. 「明日」の配信
+            else if (message.includes("明日") && message.includes("配信")) {
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                const tomorrowKey = getFormattedDate(tomorrow);
+                replyText = scheduleData[tomorrowKey] ? `明日の予定は ${scheduleData[tomorrowKey]} だよ！` : "明日の予定はまだ決まってないよ。";
+                currentScene = scheduleData[tomorrowKey] ? scenes.happy : scenes.normal;
+            }
+            
+            // 3-3. 「明後日」の配信
+            else if (message.includes("明後日") && message.includes("配信")) {
+                const dayAfterTomorrow = new Date();
+                dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
+                const dayAfterTomorrowKey = getFormattedDate(dayAfterTomorrow);
+                replyText = scheduleData[dayAfterTomorrowKey] ? `明後日の予定は ${scheduleData[dayAfterTomorrowKey]} だよ！` : "明後日の予定はまだ決まってないよ。";
+                currentScene = scheduleData[dayAfterTomorrowKey] ? scenes.happy : scenes.normal;
+            }
+
+            // 3-4. 「入力方式が間違っている」
+            else if ((message.includes("配信") && (message.includes("今日") || message.includes("明日") || message.includes("明後日"))) || dateMatch) {
+                replyText = "日付の入力方式が間違ってるみたい。例えば「5月5日」や「5/5」、「今日 or 明日 or明後日」みたいに入力してみて！";
+                currentScene = scenes.angry;
+            }
+
+            // 4. 数当てゲーム開始（Python版 logic.py 再現）
+            else if (message.includes("数当て")) {
+                status.hit_answer = Math.floor(Math.random() * 100) + 1;
+                status.hitgame_flg = true;
+                replyText = "1〜100の間で数字を当ててみて！";
+            }
+            // 5. その他
+            else if (message.includes("雑魚")) {
+                replyText = "は？誰が雑魚だって？";
+                currentScene = scenes.angry;
+            } else {
+                replyText = "んー、よくわかんない。";
+            }
+        }
+
+        msgElement.innerText = replyText;
+        img.src = currentScene;
+        const area = document.getElementById("messages");
+        area.scrollTop = area.scrollHeight;
+    }
+
+    /* --- 4. ユーティリティ --- */
+    function getFormattedDate(dateObj) {
+        const y = dateObj.getFullYear();
+        const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const d = String(dateObj.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+    }
+
+    function addMessage(text, type) {
+        const div = document.createElement("div");
+        div.className = `msg ${type}`;
+        div.innerText = text;
+        const area = document.getElementById("messages");
+        area.appendChild(div);
+        area.scrollTop = area.scrollHeight;
+        return div;
+    }
+
+    // Enterキー対応
+    document.getElementById("user-input").addEventListener("keypress", (e) => {
+        if (e.key === "Enter") chatProcess();
+    });
+</script>
+</body>
+</html>
