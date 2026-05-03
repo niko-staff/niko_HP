@@ -3,78 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AIキャラ・チャットシステム（フル機能版）</title>
+    <title>チャットボット - にこのHP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        body, html { 
-            margin: 0; padding: 0; height: 100%; width: 100%; 
-            overflow: hidden; font-family: "HG創英角ﾎﾟｯﾌﾟ体", "Meiryo", sans-serif; 
+        :root {
+            --niko-pink-light: #ffe6ea;
+            --niko-pink: #ffb5c5;
+            --niko-cream: #fffaf0;
+            --niko-gold: #f0e68c;
+            --niko-brown: #8b4513;
+            --font-main: 'Mochiy+Pop One', sans-serif;
+            --font-sub: 'Quicksand', sans-serif;
+        }
+
+        /* 全体の背景設定 */
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background-color: var(--niko-pink-light); color: var(--niko-brown);
+            font-family: var(--font-main); 
+            overflow: hidden; /* チャットエリア内でスクロールさせるため */
+        }
+
+        /* 共通コンテナ */
+        .container {
+            position: fixed; inset: 0; display: flex; flex-direction: column; z-index: 500;
+            background: radial-gradient(circle, var(--niko-cream) 0%, var(--niko-pink-light) 100%);
+        }
+
+        /* ヘッダー：お知らせページのスタイルを完全継承 */
+        header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 20px 50px; background: #fff; box-shadow: 0 2px 10px rgba(255, 181, 197, 0.3);
+            border-bottom: 4px solid var(--niko-pink);
+            z-index: 10;
+        }
+
+        header h1 {
+            font-size: 28px; color: var(--niko-pink); margin: 0;
+            text-shadow: 1px 1px 0 #fff;
+        }
+
+        header a {
+            background: var(--niko-pink); color: #fff; padding: 10px 20px;
+            border-radius: 20px; text-decoration: none; font-size: 14px;
+            border: 2px solid var(--niko-cream); transition: 0.3s ease;
+        }
+
+        header a:hover {
+            background: var(--niko-cream); color: var(--niko-pink);
+        }
+
+        /* チャットエリアのレイアウト */
+        main {
+            flex: 1; position: relative; display: flex; flex-direction: column; overflow: hidden;
         }
 
         /* キャラクター背景 */
         #character-bg {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            object-fit: cover; z-index: 1; transition: opacity 0.5s;
+            object-fit: cover; z-index: 1; opacity: 0.6; /* 文字を読みやすくするため少し薄く */
         }
 
-        /* UIレイヤー */
-        #ui-layer {
-            position: relative; z-index: 2; height: 100%; width: 100%;
-            display: flex; flex-direction: column;
-            background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.7) 100%);
-        }
-
-        /* メッセージエリア */
+        /* メッセージ表示部 */
         #messages {
-            flex: 1; padding: 40px; overflow-y: auto;
+            flex: 1; position: relative; z-index: 2;
+            padding: 30px 50px; overflow-y: auto;
             display: flex; flex-direction: column; gap: 15px;
         }
-        #messages::-webkit-scrollbar { width: 0; }
 
-        /* 吹き出しスタイル */
+        /* 吹き出しスタイル：にこのHP仕様 */
         .msg {
-            padding: 15px 25px; border-radius: 15px; max-width: 65%;
-            font-size: 20px; font-weight: bold; line-height: 1.5;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            padding: 15px 25px; border-radius: 20px; max-width: 70%;
+            font-size: 18px; line-height: 1.6; box-shadow: 0 4px 10px rgba(255, 181, 197, 0.2);
+            animation: slideIn 0.4s ease-out;
         }
-        .bot { background: rgba(255, 255, 255, 0.95); align-self: flex-start; color: #111; }
-        .user { background: rgba(0, 123, 255, 0.9); align-self: flex-end; color: white; }
+        .bot { 
+            background: #fff; align-self: flex-start; color: var(--niko-brown);
+            border-left: 6px solid var(--niko-pink);
+        }
+        .user { 
+            background: var(--niko-pink); align-self: flex-end; color: #fff; 
+            font-family: var(--font-sub);
+        }
 
-        /* 入力エリア（Python版の配置を意識） */
+        /* 入力エリア */
         #input-area {
-            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
-            padding: 30px; display: flex; justify-content: center; gap: 15px;
+            position: relative; z-index: 3;
+            background: #fff; padding: 20px 50px;
+            display: flex; gap: 15px; border-top: 2px solid var(--niko-pink-light);
         }
         input { 
-            width: 50%; padding: 15px 20px; font-size: 18px; 
-            border: none; border-radius: 30px; outline: none; background: white;
+            flex: 1; padding: 15px 25px; font-size: 16px; font-family: var(--font-sub);
+            border: 2px solid var(--niko-pink-light); border-radius: 30px; outline: none;
+            color: var(--niko-brown); background: var(--niko-cream);
         }
+        input:focus { border-color: var(--niko-pink); }
         button { 
-            background: #007bff; color: white; border: none; 
+            background: var(--niko-pink); color: white; border: none; 
             padding: 0 30px; border-radius: 30px; cursor: pointer; 
-            font-weight: bold; font-size: 18px;
+            font-family: var(--font-main); font-size: 16px; transition: 0.3s;
         }
+        button:hover { background: var(--niko-gold); color: var(--niko-brown); }
+
+        /* アニメーション */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* スクロールバー */
+        #messages::-webkit-scrollbar { width: 8px; }
+        #messages::-webkit-scrollbar-track { background: transparent; }
+        #messages::-webkit-scrollbar-thumb { background: var(--niko-pink); border-radius: 10px; }
     </style>
 </head>
 <body>
 
-<img id="character-bg" src="https://via.placeholder.com/1920x1080/444/fff?text=Wait..." alt="character">
+    <div class="container">
+        <header>
+            <h1>にことおしゃべり</h1>
+            <a href="index.html">← ホームへ戻る</a>
+        </header>
 
-<div id="ui-layer">
-    <div id="messages">
-        <div class="msg bot">（……なにか用？）</div>
+        <main>
+
+            <div id="messages">
+                <div class="msg bot">やっほー！にこだよ🧸<br>なにか聞きたいことある？</div>
+            </div>
+            
+            <div id="input-area">
+                <input type="text" id="user-input" placeholder="例：プロフィール、今日の配信、5/5の予定" autocomplete="off">
+                <button onclick="chatProcess()">送信</button>
+            </div>
+        </main>
     </div>
-    
-    <div id="input-area">
-        <input type="text" id="user-input" placeholder="例：プロフィール、今日の配信、5/5の予定" autocomplete="off">
-        <button onclick="chatProcess()">送信</button>
-    </div>
-</div>
 
 <script>
-    /* --- 1. データ設定エリア --- */
-    const profileText = "【自己紹介】\n名前：のあ\n趣味：ゲーム実況、歌うこと\n一言：最強のVTuberになるから、ちゃんと見ててよね！";
+    /* --- 1. データ設定 --- */
+    const profileText = "名前：にこ🧸\n好きなこと：みんなとのおしゃべり、美味しいもの食べること！\n最強に可愛いホームページを作ってもらってご機嫌なんだ( *´꒳`*)";
 
-    // テスト用スケジュールデータ（YYYY-MM-DDをキーにする）
     const scheduleData = {
         "2026-05-04": "23:00〜：漢字でGO!",
         "2026-05-05": "23:00〜：リスナー参加型（マリオカート８DX）",
@@ -85,23 +152,9 @@
         "2026-05-10": "23:00〜：トモコレ"
     };
 
-    // 表情画像URL
-    const scenes = {
-        "normal": "https://via.placeholder.com/1920x1080/444/fff?text=Normal",
-        "happy": "https://via.placeholder.com/1920x1080/ff69b4/fff?text=Happy",
-        "angry": "https://via.placeholder.com/1920x1080/f00/fff?text=Angry"
-    };
+    const status = { hitgame_flg: false, hit_answer: null };
 
-    /* --- 2. 状態管理（Pythonのstatus.py/logic.pyを再現） --- */
-    const status = {
-        hitgame_flg: false,
-        hit_answer: null
-    };
-
-    // 初期画像
-    document.getElementById("character-bg").src = scenes.normal;
-
-    /* --- 3. メイン処理 --- */
+    /* --- 2. メイン処理 --- */
     function chatProcess() {
         const input = document.getElementById("user-input");
         const msgVal = input.value.trim();
@@ -110,8 +163,7 @@
         addMessage(msgVal, "user");
         input.value = "";
 
-        // Python版の "connecting" 演出を再現
-        const botMsgDiv = addMessage("connecting...", "bot");
+        const botMsgDiv = addMessage("考え中...", "bot");
 
         setTimeout(() => {
             handleLogic(msgVal, botMsgDiv);
@@ -119,94 +171,57 @@
     }
 
     function handleLogic(message, msgElement) {
-        const img = document.getElementById("character-bg");
         let replyText = "";
-        let currentScene = scenes.normal;
-
-        // A. 日付指定の抽出（正規表現：5月5日 や 5/5 に対応）
         const dateMatch = message.match(/(\d{1,2})[月\/\-](\d{1,2})/);
 
-        // B. 数当てゲーム実行中（Python版ロジック）
         if (status.hitgame_flg) {
             const userNum = parseInt(message);
             if (isNaN(userNum)) {
-                replyText = "数字で答えてくれない？";
+                replyText = "数字で答えてほしいな！";
             } else if (userNum === status.hit_answer) {
-                replyText = `正解！！答えは ${status.hit_answer} だよ！`;
-                currentScene = scenes.happy;
+                replyText = `正解！！答えは ${status.hit_answer} だよ！やったね！`;
                 status.hitgame_flg = false;
             } else {
-                replyText = userNum > status.hit_answer ? "もっと小さいよ" : "もっと大きいよ";
+                replyText = userNum > status.hit_answer ? "もっと小さいよ〜" : "もっと大きいよ〜";
             }
         } 
-        // C. 通常キーワード判定
         else {
-            // 1. プロフィール
             if (message.includes("プロフィール") || message.includes("自己紹介")) {
                 replyText = profileText;
-                currentScene = scenes.happy;
             }
-            // 2. 日付直接指定の検索
             else if (dateMatch) {
                 const m = dateMatch[1].padStart(2, '0');
                 const d = dateMatch[2].padStart(2, '0');
-                const key = `2026-${m}-${d}`; // 年は固定（必要に応じ自動取得）
-                replyText = scheduleData[key] ? `${m}月${d}日の予定は、${scheduleData[key]} だよ！` : `${m}月${d}日の予定はまだ入ってないな。`;
-                currentScene = scheduleData[key] ? scenes.happy : scenes.normal;
+                const key = `2026-${m}-${d}`;
+                replyText = scheduleData[key] ? `${m}月${d}日の予定は、${scheduleData[key]} だよ！` : `${m}月${d}日はまだ予定がないみたい。`;
             }
-            // 3-1. 「今日」の配信
             else if (message.includes("今日") && message.includes("配信")) {
                 const todayKey = getFormattedDate(new Date());
-                replyText = scheduleData[todayKey] ? `今日の予定は ${scheduleData[todayKey]} だよ！` : "今日の予定はまだ決まってないよ。";
-                currentScene = scheduleData[todayKey] ? scenes.happy : scenes.normal;
+                replyText = scheduleData[todayKey] ? `今日の予定は ${scheduleData[todayKey]} だよ！楽しみだね！` : "今日はのんびりする予定だよ〜( *´꒳`*)";
             }
-
-            // 3-2. 「明日」の配信
             else if (message.includes("明日") && message.includes("配信")) {
                 const tomorrow = new Date();
                 tomorrow.setDate(tomorrow.getDate() + 1);
-                const tomorrowKey = getFormattedDate(tomorrow);
-                replyText = scheduleData[tomorrowKey] ? `明日の予定は ${scheduleData[tomorrowKey]} だよ！` : "明日の予定はまだ決まってないよ。";
-                currentScene = scheduleData[tomorrowKey] ? scenes.happy : scenes.normal;
+                const key = getFormattedDate(tomorrow);
+                replyText = scheduleData[key] ? `明日の予定は ${scheduleData[key]} だよ！` : "明日の予定はまだ決まってないみたい。";
             }
-            
-            // 3-3. 「明後日」の配信
-            else if (message.includes("明後日") && message.includes("配信")) {
-                const dayAfterTomorrow = new Date();
-                dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
-                const dayAfterTomorrowKey = getFormattedDate(dayAfterTomorrow);
-                replyText = scheduleData[dayAfterTomorrowKey] ? `明後日の予定は ${scheduleData[dayAfterTomorrowKey]} だよ！` : "明後日の予定はまだ決まってないよ。";
-                currentScene = scheduleData[dayAfterTomorrowKey] ? scenes.happy : scenes.normal;
-            }
-
-            // 3-4. 「入力方式が間違っている」
-            else if ((message.includes("配信") && (message.includes("今日") || message.includes("明日") || message.includes("明後日"))) || dateMatch) {
-                replyText = "日付の入力方式が間違ってるみたい。例えば「5月5日」や「5/5」、「今日 or 明日 or明後日」みたいに入力してみて！";
-                currentScene = scenes.angry;
-            }
-
-            // 4. 数当てゲーム開始（Python版 logic.py 再現）
             else if (message.includes("数当て")) {
                 status.hit_answer = Math.floor(Math.random() * 100) + 1;
                 status.hitgame_flg = true;
                 replyText = "1〜100の間で数字を当ててみて！";
             }
-            // 5. その他
             else if (message.includes("雑魚")) {
-                replyText = "は？誰が雑魚だって？";
-                currentScene = scenes.angry;
+                replyText = "は？誰が雑魚だって？（おこ）";
             } else {
-                replyText = "んー、よくわかんない。";
+                replyText = "んー、よくわかんない。日付とかプロフィールって聞いてみて？";
             }
         }
 
         msgElement.innerText = replyText;
-        img.src = currentScene;
         const area = document.getElementById("messages");
         area.scrollTop = area.scrollHeight;
     }
 
-    /* --- 4. ユーティリティ --- */
     function getFormattedDate(dateObj) {
         const y = dateObj.getFullYear();
         const m = String(dateObj.getMonth() + 1).padStart(2, '0');
@@ -224,7 +239,6 @@
         return div;
     }
 
-    // Enterキー対応
     document.getElementById("user-input").addEventListener("keypress", (e) => {
         if (e.key === "Enter") chatProcess();
     });
