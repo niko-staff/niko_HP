@@ -128,9 +128,14 @@
         <main>
 
             <div id="messages">
-                <div class="msg bot">※現在、密かに返答内容を増やしています。<br>【
-                    現在返答できる内容】<br>
-                    ・配信スケジュール
+                <div class="msg bot">『にこと秘密のチャット』へようこそ！<br>
+                    今お返事できる内容は以下の通りだよ！<br>
+                    ・今日、明日、明後日（または日付指定）の配信スケジュール表示<br>
+                    ・数当てゲーム<br>
+                    ・自己紹介<br>
+                    ・おはよう等の挨拶（はろにこ・おつにこにも対応）<br>
+                    ・好きな食べ物<br>
+                    ・にこのSNSリンク<br>
                 </div>
             </div>
             
@@ -180,12 +185,12 @@
         if (status.hitgame_flg) {
             const userNum = parseInt(message);
             if (isNaN(userNum)) {
-                replyText = "数字で答えてほしいな！";
+                replyText = "半角数字で答えてほしいな！";
             } else if (userNum === status.hit_answer) {
-                replyText = `正解！！答えは ${status.hit_answer} だよ！やったね！`;
+                replyText = `正解！！答えは ${status.hit_answer} ！`;
                 status.hitgame_flg = false;
             } else {
-                replyText = userNum > status.hit_answer ? "もっと小さいよ〜" : "もっと大きいよ〜";
+                replyText = userNum > status.hit_answer ? "小さい数字だよ〜" : "大きい数字だよ〜";
             }
         } 
         else {
@@ -200,7 +205,7 @@
             }
             else if (message.includes("今日") && message.includes("配信")) {
                 const todayKey = getFormattedDate(new Date());
-                replyText = scheduleData[todayKey] ? `今日の予定は ${scheduleData[todayKey]} だよ！楽しみだね！` : "今日はのんびりする予定だよ〜( *´꒳`*)";
+                replyText = scheduleData[todayKey] ? `今日の予定は ${scheduleData[todayKey]} だよ！` : "今日はのんびりする予定だよ〜( *´꒳`*)";
             }
             else if (message.includes("明日") && message.includes("配信")) {
                 const tomorrow = new Date();
@@ -213,8 +218,38 @@
                 status.hitgame_flg = true;
                 replyText = "1〜100の間で数字を当ててみて！";
             }
-            else if (message.includes("雑魚")) {
-                replyText = "は？誰が雑魚だって？（おこ）";
+            else if (message.includes("大バカ")) {
+                replyText = "大バカじゃない！にこはちょっとバカなだけ！";
+
+            //追加実装内容
+            } else if (message.includes("好きな食べ物")) {
+                replyText = "にこは甘いものが大好き！特にイチゴのショートケーキは最高だよ🍰🍓";
+
+            } else if (message.includes("おはよう") || message.includes("おはよ")) {
+                replyText = "おはよう！今日も一緒に楽しい時間を過ごそうね😊";
+
+            } else if (message.includes("こんにちは")) {
+                replyText = "こんにちは！午後は何をするのかな〜？";
+
+            } else if (message.includes("こんばんは")) {
+                replyText = "こんばんは！夜も一緒に楽しもうね🌙";
+
+            } else if (message.includes("はろにこ")) {
+                const todayKey = getFormattedDate(new Date());
+                replyText = scheduleData[todayKey] ? "はろにこ！"<dr>`今日の予定は ${scheduleData[todayKey]} だよ！` : "はろにこ！今日の配信はまだ未定だよ〜！";
+            
+            } else if (message.includes("おつにこ")) {
+                replyText = "おつにこ！今日も頑張ったね！";
+
+            }else if (message.includes("Twitter") || message.includes("X") || message.includes("ツイッター") || message.includes("ついったー") || message.includes("x")) {
+                replyText = "にこのX（旧Twitter）はこれだよ！\nhttps://x.com/niko01_kuma?s=20";
+
+            }else if (message.includes("配信サイト") || message.includes("ツイキャス") || message.includes("ついきゃす")) {
+                replyText = "にこの配信サイト（ツイキャス）はこれだよ！\nhttps://twitcasting.tv/niko01_kuma";
+
+            }else if (message.includes("YouTube") || message.includes("ユーチューブ") || message.includes("ゆーちゅーぶ")) {
+                replyText = "にこのYouTubeはこれだよ！\nhttps://www.youtube.com/@niko_mohu";
+
             } else {
                 replyText = "んー、よくわかんない。日付とかプロフィールって聞いてみて？";
             }
