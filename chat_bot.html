@@ -203,11 +203,11 @@
                 const key = `2026-${m}-${d}`;
                 replyText = scheduleData[key] ? `${m}月${d}日の予定は、${scheduleData[key]} だよ！` : `${m}月${d}日はまだ予定がないみたい。`;
             }
-            else if (message.includes("今日") && message.includes("配信")) {
+            else if (message.includes("今日") && message.includes("配信") || message.includes("今日") && message.includes("スケジュール") || message.includes("今日") && message.includes("予定")) {
                 const todayKey = getFormattedDate(new Date());
                 replyText = scheduleData[todayKey] ? `今日の予定は ${scheduleData[todayKey]} だよ！` : "今日はのんびりする予定だよ〜( *´꒳`*)";
             }
-            else if (message.includes("明日") && message.includes("配信")) {
+            else if (message.includes("明日") && message.includes("配信") || message.includes("明日") && message.includes("スケジュール") || message.includes("明日") && message.includes("予定")) {
                 const tomorrow = new Date();
                 tomorrow.setDate(tomorrow.getDate() + 1);
                 const key = getFormattedDate(tomorrow);
@@ -254,7 +254,7 @@
                 replyText = "それはたおたおさん！";
 
             } else {
-                replyText = "んー、よくわかんない。日付とかプロフィールって聞いてみて？";
+                replyText = "ごめんね、まだその質問には答えられないんだ...！";
             }
         }
 
