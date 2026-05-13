@@ -236,7 +236,7 @@
 
             } else if (message.includes("はろにこ")) {
                 const todayKey = getFormattedDate(new Date());
-                replyText = scheduleData[todayKey] ? "はろにこ！"<dr>`今日の予定は ${scheduleData[todayKey]} だよ！` : "はろにこ！今日の配信はまだ未定だよ〜！";
+                replyText = scheduleData[todayKey] ? "はろにこ！" + "\n" + `今日の予定は ${scheduleData[todayKey]} だよ！` : "はろにこ！今日の配信はまだ未定だよ〜！";
             
             } else if (message.includes("おつにこ")) {
                 replyText = "おつにこ！今日も頑張ったね！";
